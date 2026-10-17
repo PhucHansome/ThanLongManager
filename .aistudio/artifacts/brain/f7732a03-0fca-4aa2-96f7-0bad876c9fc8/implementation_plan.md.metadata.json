@@ -1,0 +1,6 @@
+{
+  "summary": "Bản thiết kế kiến trúc và kế hoạch triển khai toàn diện cho Web App Quản lý Thần Long Mobile Auto Pro (Bước 1 - Bước 6):\n- Bước 1: Xác nhận bối cảnh, thực thể DB và luồng nghiệp vụ 2 Role (User & Admin).\n- Bước 2: Đề xuất cấu trúc thư mục hoàn chỉnh Next.js 14 App Router.\n- Bước 3: Danh sách và đặc tả logic toàn bộ các hàm RPC Supabase (cũ và mới cần thêm).\n- Bước 4: Danh mục toàn bộ Next.js API Routes bảo mật với Bearer JWT.\n- Bước 5: Sơ đồ luồng thanh toán VietQR và Webhook Sepay.vn (ASCII Sequence Diagram).\n- Bước 6: Phân tích 7 rủi ro bảo mật và giải pháp kỹ thuật chi tiết (Race condition, Replay attack, Fake Webhook, Expiration, Mismatched amount, RBAC).",
+  "updatedAt": "2026-10-13T14:23:37.472544150Z",
+  "requestFeedback": true,
+  "userFacing": true
+}

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thần Long Mobile Auto Pro</title>
+    <meta name="description" content="Hệ thống quản lý bản quyền, gia hạn tự động qua VietQR và quản trị doanh thu cho Thần Long Mobile Auto Pro." />
+    <meta property="og:title" content="Thần Long Mobile Auto Pro" />
+    <meta property="og:description" content="Hệ thống quản lý bản quyền, gia hạn tự động qua VietQR và quản trị doanh thu cho Thần Long Mobile Auto Pro." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      // Gracefully prevent Vite HMR WebSocket connection failure notices in iframe preview
+      (function() {
+        var origError = console.error;
+        console.error = function() {
+          var str = Array.prototype.slice.call(arguments).join(' ');
+          if (str.indexOf('WebSocket') !== -1 || str.indexOf('[vite]') !== -1 || str.indexOf('closed without opened') !== -1) {
+            return;
+          }
+          origError.apply(console, arguments);
+        };
+        window.addEventListener('unhandledrejection', function(event) {
+          var msg = (event.reason && (event.reason.message || event.reason.toString())) || '';
+          if (msg.indexOf('WebSocket') !== -1 || msg.indexOf('failed to connect') !== -1 || msg.indexOf('closed without opened') !== -1) {
+            event.preventDefault();
+          }
+        });
+        window.addEventListener('error', function(event) {
+          var msg = (event.message || '');
+          if (msg.indexOf('WebSocket') !== -1 || msg.indexOf('failed to connect') !== -1 || msg.indexOf('closed without opened') !== -1) {
+            event.preventDefault();
+          }
+        });
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

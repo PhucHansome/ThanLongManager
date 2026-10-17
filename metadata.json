@@ -1,0 +1,6 @@
+{
+  "name": "Thần Long Mobile Auto Pro",
+  "description": "Hệ thống quản lý bản quyền, gia hạn tự động qua VietQR và quản trị doanh thu cho Thần Long Mobile Auto Pro.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
