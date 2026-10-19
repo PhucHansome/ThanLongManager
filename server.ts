@@ -19,7 +19,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'thanlong_jwt_secret_2026_secured';
 const SEPAY_API_KEY = process.env.SEPAY_API_KEY || '';
 const ADMIN_BANK_CODE = process.env.ADMIN_BANK_CODE || 'VIETINBANK';
 const ADMIN_BANK_ACCOUNT = process.env.ADMIN_BANK_ACCOUNT || '107872473033';
-const ADMIN_BANK_NAME = process.env.ADMIN_BANK_NAME || 'NGUYEN VAN A';
+const ADMIN_BANK_NAME = process.env.ADMIN_BANK_NAME || 'NGUYEN VAN PHUC';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ujcmnkhjqeohtyorvusy.supabase.co';
 const rawSupabaseKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '').trim();
