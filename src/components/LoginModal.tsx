@@ -13,7 +13,8 @@ import {
   Phone,
   UserPlus,
   LogIn,
-  AlertCircle
+  AlertCircle,
+  Youtube
 } from 'lucide-react';
 
 interface LoginModalProps {
@@ -144,18 +145,19 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       <div className="absolute bottom-1/4 left-1/3 w-80 h-80 bg-rose-500/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10">
-        {onClose && (
-          <div className="mb-4 flex items-center justify-between">
-            <button
-              onClick={onClose}
-              type="button"
-              className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors cursor-pointer"
-            >
-              <span>← Quay lại trang giới thiệu</span>
-            </button>
-            <span className="text-[11px] text-zinc-500 font-mono">Chế độ Khách</span>
-          </div>
-        )}
+        {/* Top Action Bar with YouTube Guide Link */}
+        <div className="mb-4 flex items-center justify-between">
+          <a
+            href="https://www.youtube.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-rose-400 hover:text-rose-300 px-3.5 py-1.5 rounded-xl bg-rose-950/40 border border-rose-800/60 hover:border-rose-700 transition-all shadow-sm cursor-pointer"
+          >
+            <Youtube className="w-4 h-4 text-rose-500" />
+            <span>📺 Hướng Dẫn Về Tool (YouTube)</span>
+          </a>
+          <span className="text-[11px] text-zinc-500 font-mono">Phiên Bản 2026</span>
+        </div>
 
         {/* Brand Header */}
         <div className="text-center mb-6">

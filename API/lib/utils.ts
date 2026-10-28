@@ -5,10 +5,10 @@ export const ADMIN_BANK_ACCOUNT = process.env.ADMIN_BANK_ACCOUNT || '10787247303
 export const ADMIN_BANK_NAME = process.env.ADMIN_BANK_NAME || 'NGUYEN VAN PHUC';
 
 export const DEFAULT_PRICING = [
-  { id: 'p-1', months: 1, price: 100000, discount_pct: 0, label: 'Gói 1 Tháng', is_active: true },
-  { id: 'p-3', months: 3, price: 270000, discount_pct: 10, label: 'Gói 3 Tháng (-10%)', is_active: true },
-  { id: 'p-6', months: 6, price: 480000, discount_pct: 20, label: 'Gói 6 Tháng (-20%)', is_active: true },
-  { id: 'p-12', months: 12, price: 840000, discount_pct: 30, label: 'Gói 1 Năm (-30%)', is_active: true }
+  { id: 'p-1', months: 1, price: 70000, discount_pct: 0, label: 'Gói 1 Tháng', is_active: true },
+  { id: 'p-3', months: 3, price: 210000, discount_pct: 6.67, label: 'Gói 3 Tháng (-6.67%)', is_active: true },
+  { id: 'p-6', months: 6, price: 420000, discount_pct: 10, label: 'Gói 6 Tháng (-10%)', is_active: true },
+  { id: 'p-12', months: 12, price: 840000, discount_pct: 16.67, label: 'Gói 1 Năm (-16.67%)', is_active: true }
 ];
 
 export function calculateDaysLeft(endDateStr: string | null | undefined): number {
@@ -17,6 +17,20 @@ export function calculateDaysLeft(endDateStr: string | null | undefined): number
   const now = Date.now();
   const diffDays = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
   return Math.max(0, diffDays);
+}
+
+export function mapDbStatusToFrontend(status: any): 'pending' | 'paid' | 'expired' | 'cancelled' {
+  if (status === 1 || status === 'paid') return 'paid';
+  if (status === 2 || status === 'expired') return 'expired';
+  if (status === 3 || status === 'cancelled') return 'cancelled';
+  return 'pending';
+}
+
+export function mapFrontendStatusToDb(status: any): number {
+  if (status === 'paid' || status === 1) return 1;
+  if (status === 'expired' || status === 2) return 2;
+  if (status === 'cancelled' || status === 3) return 3;
+  return 0; // pending
 }
 
 export function extractIPv4(req: VercelRequest): string {

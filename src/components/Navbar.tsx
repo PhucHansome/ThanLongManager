@@ -1,6 +1,6 @@
 import React from 'react';
 import { User } from '../types';
-import { Shield, User as UserIcon, LogOut, Terminal, Layers, Globe } from 'lucide-react';
+import { Shield, User as UserIcon, LogOut, Terminal, Layers, Youtube } from 'lucide-react';
 
 interface NavbarProps {
   user: User | null;
@@ -18,8 +18,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   onSelectTab,
   onLogout,
-  onSwitchRole,
-  onGoToLanding
+  onSwitchRole
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/80 px-6 py-3.5">
@@ -43,7 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <>
               <button
                 onClick={() => onSelectTab?.('overview')}
-                className={`whitespace-nowrap transition-colors hover:text-zinc-100 ${
+                className={`whitespace-nowrap transition-colors hover:text-zinc-100 cursor-pointer ${
                   activeTab === 'overview' ? 'text-amber-400 font-semibold' : ''
                 }`}
               >
@@ -51,7 +50,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <button
                 onClick={() => onSelectTab?.('users')}
-                className={`whitespace-nowrap transition-colors hover:text-zinc-100 ${
+                className={`whitespace-nowrap transition-colors hover:text-zinc-100 cursor-pointer ${
                   activeTab === 'users' ? 'text-amber-400 font-semibold' : ''
                 }`}
               >
@@ -59,7 +58,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <button
                 onClick={() => onSelectTab?.('orders')}
-                className={`whitespace-nowrap transition-colors hover:text-zinc-100 ${
+                className={`whitespace-nowrap transition-colors hover:text-zinc-100 cursor-pointer ${
                   activeTab === 'orders' ? 'text-amber-400 font-semibold' : ''
                 }`}
               >
@@ -67,26 +66,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <button
                 onClick={() => onSelectTab?.('revenue')}
-                className={`whitespace-nowrap transition-colors hover:text-zinc-100 ${
+                className={`whitespace-nowrap transition-colors hover:text-zinc-100 cursor-pointer ${
                   activeTab === 'revenue' ? 'text-amber-400 font-semibold' : ''
                 }`}
               >
                 Sổ Cái Doanh Thu
-              </button>
-              <button
-                onClick={() => onSelectTab?.('sql')}
-                className={`whitespace-nowrap transition-colors hover:text-zinc-100 ${
-                  activeTab === 'sql' ? 'text-amber-400 font-semibold' : ''
-                }`}
-              >
-                SQL & Tích Hợp
               </button>
             </>
           ) : (
             <>
               <button
                 onClick={() => onSelectTab?.('dashboard')}
-                className={`whitespace-nowrap transition-colors hover:text-zinc-100 ${
+                className={`whitespace-nowrap transition-colors hover:text-zinc-100 cursor-pointer ${
                   activeTab === 'dashboard' ? 'text-amber-400 font-semibold' : ''
                 }`}
               >
@@ -94,7 +85,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <button
                 onClick={() => onSelectTab?.('history')}
-                className={`whitespace-nowrap transition-colors hover:text-zinc-100 ${
+                className={`whitespace-nowrap transition-colors hover:text-zinc-100 cursor-pointer ${
                   activeTab === 'history' ? 'text-amber-400 font-semibold' : ''
                 }`}
               >
@@ -102,7 +93,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <button
                 onClick={() => onSelectTab?.('machines')}
-                className={`whitespace-nowrap transition-colors hover:text-zinc-100 ${
+                className={`whitespace-nowrap transition-colors hover:text-zinc-100 cursor-pointer ${
                   activeTab === 'machines' ? 'text-amber-400 font-semibold' : ''
                 }`}
               >
@@ -114,6 +105,18 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Zone 3: Primary action & User profile */}
         <div className="flex items-center gap-4 shrink-0">
+          {/* Link YouTube Hướng Dẫn */}
+          <a
+            href="https://www.youtube.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Xem Video Hướng Dẫn Về Tool Trên YouTube"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-400 bg-rose-950/40 hover:bg-rose-900/40 transition-colors border border-rose-800/60 cursor-pointer"
+          >
+            <Youtube className="w-3.5 h-3.5 text-rose-500" />
+            <span className="hidden sm:inline">Hướng Dẫn Về Tool</span>
+          </a>
+
           {user && (
             <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs">
               {user.role === 'admin' ? (
@@ -130,20 +133,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={onSwitchRole}
               title="Chuyển chế độ xem để test giao diện User"
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-300 bg-zinc-800/80 hover:bg-zinc-700/80 transition-colors border border-zinc-700/60"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-300 bg-zinc-800/80 hover:bg-zinc-700/80 transition-colors border border-zinc-700/60 cursor-pointer"
             >
               <Layers className="w-3.5 h-3.5 text-amber-400" />
               <span>Chế độ xem: {currentRole === 'admin' ? 'Admin' : 'User'}</span>
-            </button>
-          )}
-
-          {onGoToLanding && (
-            <button
-              onClick={onGoToLanding}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/40 transition-colors border border-emerald-800/60 cursor-pointer"
-            >
-              <Globe className="w-3.5 h-3.5" />
-              <span>Trang Giới Thiệu</span>
             </button>
           )}
 

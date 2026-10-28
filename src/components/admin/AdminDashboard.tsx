@@ -9,10 +9,7 @@ import {
   CreditCard,
   Calendar,
   Award,
-  RefreshCw,
-  ArrowUpRight,
-  ShieldAlert,
-  UserCheck
+  RefreshCw
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
@@ -45,8 +42,18 @@ export const AdminDashboard: React.FC = () => {
     );
   }
 
+  // Safe fallback properties
+  const revenueThisMonth = stats.revenue_this_month ?? 0;
+  const grossThisMonth = stats.gross_this_month ?? 0;
+  const commissionThisMonth = stats.commission_this_month ?? 0;
+  const revenueThisYear = stats.revenue_this_year ?? 0;
+  const usersCount = stats.users_count ?? { total: 0, active: 0, locked: 0, expired: 0 };
+  const ordersCount = stats.orders_count ?? { paid_this_month: 0, pending_this_month: 0, total_this_month: 0 };
+  const monthlyRevenue12m = stats.monthly_revenue_12m ?? [];
+  const top10Spenders = stats.top_10_spenders ?? [];
+
   // Max value for 12m chart scaling
-  const maxMonthlyRevenue = Math.max(1, ...stats.monthly_revenue_12m.map(m => m.net));
+  const maxMonthlyRevenue = Math.max(1, ...monthlyRevenue12m.map(m => m.net || 0));
 
   return (
     <div className="space-y-8 animate-in fade-in">
@@ -61,7 +68,7 @@ export const AdminDashboard: React.FC = () => {
 
         <button
           onClick={fetchStats}
-          className="px-3.5 py-2 text-xs font-medium text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-xl transition-colors flex items-center gap-2"
+          className="px-3.5 py-2 text-xs font-medium text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-xl transition-colors flex items-center gap-2 cursor-pointer"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           <span>Làm mới dữ liệu</span>
@@ -79,10 +86,10 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
           <div className="font-mono font-bold text-2xl text-emerald-400">
-            {formatVND(stats.revenue_this_month)}
+            {formatVND(revenueThisMonth)}
           </div>
           <div className="text-[11px] text-zinc-500">
-            Gộp: {formatVND(stats.gross_this_month)} · Hoa hồng: {formatVND(stats.commission_this_month)}
+            Gộp: {formatVND(grossThisMonth)} · Hoa hồng: {formatVND(commissionThisMonth)}
           </div>
         </div>
 
@@ -95,7 +102,7 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
           <div className="font-mono font-bold text-2xl text-amber-400">
-            {formatVND(stats.revenue_this_year)}
+            {formatVND(revenueThisYear)}
           </div>
           <div className="text-[11px] text-zinc-500">Đã khấu trừ 100% phí đối tác thứ 3</div>
         </div>
@@ -109,11 +116,11 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
           <div className="font-mono font-bold text-2xl text-zinc-100">
-            {stats.users_count.active} <span className="text-sm font-normal text-zinc-500">/ {stats.users_count.total} user</span>
+            {usersCount.active} <span className="text-sm font-normal text-zinc-500">/ {usersCount.total} user</span>
           </div>
           <div className="text-[11px] text-zinc-500">
-            Hết hạn: <span className="text-rose-400 font-semibold">{stats.users_count.expired}</span> · Đang khoá:{' '}
-            <span className="text-amber-400 font-semibold">{stats.users_count.locked}</span>
+            Hết hạn: <span className="text-rose-400 font-semibold">{usersCount.expired}</span> · Đang khoá:{' '}
+            <span className="text-amber-400 font-semibold">{usersCount.locked}</span>
           </div>
         </div>
 
@@ -126,11 +133,11 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
           <div className="font-mono font-bold text-2xl text-zinc-100">
-            {stats.orders_count.paid_this_month} <span className="text-sm font-normal text-emerald-400">đã nạp</span>
+            {ordersCount.paid_this_month} <span className="text-sm font-normal text-emerald-400">đã nạp</span>
           </div>
           <div className="text-[11px] text-zinc-500">
-            Chờ quét QR: <span className="text-amber-400 font-semibold">{stats.orders_count.pending_this_month}</span> · Tổng:{' '}
-            {stats.orders_count.total_this_month}
+            Chờ quét QR: <span className="text-amber-400 font-semibold">{ordersCount.pending_this_month}</span> · Tổng:{' '}
+            {ordersCount.total_this_month}
           </div>
         </div>
       </div>
@@ -148,14 +155,14 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         <div className="h-56 flex items-end gap-2 sm:gap-4 pt-6 pb-2 border-b border-zinc-800">
-          {stats.monthly_revenue_12m.map((m, idx) => {
-            const heightPct = Math.max(8, (m.net / maxMonthlyRevenue) * 100);
+          {monthlyRevenue12m.map((m, idx) => {
+            const heightPct = Math.max(8, ((m.net || 0) / maxMonthlyRevenue) * 100);
             return (
               <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group relative">
                 {/* Tooltip on hover */}
                 <div className="absolute -top-12 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-950 border border-zinc-700 text-zinc-200 text-[10px] py-1 px-2 rounded-lg pointer-events-none whitespace-nowrap z-20 shadow-lg">
-                  <div className="font-bold text-amber-400">{formatVND(m.net)}</div>
-                  <div className="text-zinc-500">{m.order_count} đơn hàng</div>
+                  <div className="font-bold text-amber-400">{formatVND(m.net || 0)}</div>
+                  <div className="text-zinc-500">{m.order_count || 0} đơn hàng</div>
                 </div>
 
                 <div
@@ -198,14 +205,14 @@ export const AdminDashboard: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/60 font-sans">
-              {stats.top_10_spenders.length === 0 ? (
+              {top10Spenders.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-6 text-center text-zinc-500">
                     Chưa có giao dịch nào được ghi nhận
                   </td>
                 </tr>
               ) : (
-                stats.top_10_spenders.map((spender, idx) => (
+                top10Spenders.map((spender, idx) => (
                   <tr key={spender.user_id} className="hover:bg-zinc-800/30 transition-colors">
                     <td className="py-3 font-mono font-bold">
                       {idx === 0 ? (

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { PaymentOrder } from '../../types';
-import { apiCheckOrderStatus, apiSimulatePayment } from '../../lib/api';
+import { apiCheckOrderStatus } from '../../lib/api';
 import { formatVND, formatDate, formatCountdown } from '../../lib/utils';
 import { useToast } from '../ui/Toast';
 import confetti from 'canvas-confetti';
-import { X, Copy, Check, Clock, ShieldCheck, CheckCircle2, AlertTriangle, RefreshCw, Zap } from 'lucide-react';
+import { X, Copy, Check, Clock, ShieldCheck, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 interface PaymentQRModalProps {
   order: PaymentOrder & { bank_code?: string; bank_account?: string; bank_name?: string };
@@ -21,8 +21,6 @@ export const PaymentQRModal: React.FC<PaymentQRModalProps> = ({
 }) => {
   const [timeLeft, setTimeLeft] = useState<number>(15 * 60); // 15 mins
   const [status, setStatus] = useState<string>(order.status);
-  const [checking, setChecking] = useState<boolean>(false);
-  const [simulating, setSimulating] = useState<boolean>(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const { showToast } = useToast();
 
@@ -77,37 +75,6 @@ export const PaymentQRModal: React.FC<PaymentQRModalProps> = ({
     });
     showToast(`Thanh toán thành công! License đã được gia hạn đến ngày ${formatDate(paidOrder.license_after)}`, 'success');
     onPaymentSuccess(paidOrder);
-  };
-
-  const handleManualCheck = async () => {
-    setChecking(true);
-    try {
-      const updated = await apiCheckOrderStatus(order.order_code);
-      if (updated.status === 'paid') {
-        setStatus('paid');
-        triggerSuccess(updated);
-      } else {
-        showToast('Hệ thống chưa nhận được tiền chuyển khoản. Vui lòng kiểm tra lại sau giây lát!', 'info');
-      }
-    } catch (err: any) {
-      showToast(err.message || 'Không thể kiểm tra đơn hàng', 'error');
-    } finally {
-      setChecking(false);
-    }
-  };
-
-  const handleSimulatePayment = async () => {
-    setSimulating(true);
-    try {
-      await apiSimulatePayment(order.order_code);
-      const updated = await apiCheckOrderStatus(order.order_code);
-      setStatus('paid');
-      triggerSuccess(updated);
-    } catch (err: any) {
-      showToast(err.message || 'Giả lập thất bại', 'error');
-    } finally {
-      setSimulating(false);
-    }
   };
 
   const copyToClipboard = (text: string, field: string) => {
@@ -274,33 +241,16 @@ export const PaymentQRModal: React.FC<PaymentQRModalProps> = ({
               </div>
             </div>
 
-            {/* Bottom Actions */}
-            <div className="mt-6 pt-5 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>Kiểm tra trạng thái tự động mỗi 5 giây</span>
+            {/* Bottom Status Info */}
+            <div className="mt-6 pt-5 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-400">
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-zinc-300 font-medium">Hệ thống đang chờ nhận tiền chuyển khoản...</span>
               </div>
 
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <button
-                  onClick={handleManualCheck}
-                  disabled={checking}
-                  className="flex-1 sm:flex-initial px-3.5 py-2 text-xs font-medium text-zinc-300 bg-zinc-800 hover:bg-zinc-700 rounded-xl transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${checking ? 'animate-spin' : ''}`} />
-                  <span>Kiểm tra ngay</span>
-                </button>
-
-                {/* Testing shortcut: simulate real webhook payment */}
-                <button
-                  onClick={handleSimulatePayment}
-                  disabled={simulating}
-                  title="Giả lập ngân hàng và Sepay bắn webhook vào hệ thống (Dành cho test)"
-                  className="flex-1 sm:flex-initial px-3.5 py-2 text-xs font-semibold text-amber-950 bg-amber-400 hover:bg-amber-300 rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm"
-                >
-                  <Zap className="w-3.5 h-3.5" />
-                  <span>Test: Giả lập chuyển khoản</span>
-                </button>
+              <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 font-mono">
+                <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                <span>Tự động kích hoạt sau 3-5 giây nhận tiền</span>
               </div>
             </div>
           </div>
