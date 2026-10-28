@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { supabase } from './_lib/supabase.js';
-import { DEFAULT_PRICING } from './_lib/utils';
+import { DEFAULT_PRICING } from './_lib/utils.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
