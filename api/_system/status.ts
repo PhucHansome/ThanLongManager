@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { supabase } from '../_lib/supabase';
-import { ADMIN_BANK_CODE, ADMIN_BANK_ACCOUNT, ADMIN_BANK_NAME } from '../_lib/utils';
+import { supabase } from '../_lib/supabase.js';
+import { ADMIN_BANK_CODE, ADMIN_BANK_ACCOUNT, ADMIN_BANK_NAME } from '../_lib/utils.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {

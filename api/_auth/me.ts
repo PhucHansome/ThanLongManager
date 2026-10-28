@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { supabase } from '../_lib/supabase';
-import { verifyJWT } from '../_lib/auth';
-import { calculateDaysLeft } from '../_lib/utils';
+import { supabase } from '../_lib/supabase.js';
+import { verifyJWT } from '../_lib/auth.js';
+import { calculateDaysLeft } from '../_lib/utils.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ status: false, message: 'Method Not Allowed' });

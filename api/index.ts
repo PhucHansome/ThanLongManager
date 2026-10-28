@@ -1,29 +1,28 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-// Đã sửa lại đường dẫn khớp với tên file mới
-import loginHandler from './_auth/login';
-import registerHandler from './_auth/register';
-import meHandler from './_auth/me';
-import changePasswordHandler from './_auth/change-password';
+import loginHandler from './_auth/login.js';
+import registerHandler from './_auth/register.js';
+import meHandler from './_auth/me.js';
+import changePasswordHandler from './_auth/change-password.js';
 
-import adminUsersHandler from './_admin/users';
-import adminUserDetailHandler from './_admin/users/user-detail'; // Sửa
-import adminUserExtendHandler from './_admin/users/user-extend'; // Sửa
-import adminUserStatusHandler from './_admin/users/user-status'; // Sửa
+import adminUsersHandler from './_admin/users.js';
+import adminUserDetailHandler from './_admin/users/user-detail.js'; 
+import adminUserExtendHandler from './_admin/users/user-extend.js'; 
+import adminUserStatusHandler from './_admin/users/user-status.js'; 
 
-import adminOrdersHandler from './_admin/orders';
-import adminStatsHandler from './_admin/stats';
-import adminRevenueHandler from './_admin/revenue.ts';
-import adminRevenueExportHandler from './_admin/revenue/export';
+import adminOrdersHandler from './_admin/orders.js';
+import adminStatsHandler from './_admin/stats.js';
+import adminRevenueHandler from './_admin/revenue.js';
+import adminRevenueExportHandler from './_admin/revenue/export.js';
 
-import ordersCreateHandler from './_orders/create';
-import orderStatusHandler from './_orders/order-status'; // Sửa
+import ordersCreateHandler from './_orders/create.js';
+import orderStatusHandler from './_orders/order-status.js'; 
 
-import pricingHandler from './_pricing';
-import systemStatusHandler from './_system/status';
-import userMachinesHandler from './_user/machines';
-import webhookSepayHandler from './_webhook/sepay';
-import webhookSimulateHandler from './_webhook/simulate-payment';
+import pricingHandler from './_pricing.js';
+import systemStatusHandler from './_system/status.js';
+import userMachinesHandler from './_user/machines.js';
+import webhookSepayHandler from './_webhook/sepay.js';
+import webhookSimulateHandler from './_webhook/simulate-payment.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const url = req.url || '';

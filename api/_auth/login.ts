@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import crypto from 'crypto';
-import { supabase } from '../_lib/supabase';
-import { createJWT } from '../_lib/auth';
-import { extractIPv4, calculateDaysLeft } from '../_lib/utils';
+import { supabase } from '../_lib/supabase.js';
+import { createJWT } from '../_lib/auth.js';
+import { extractIPv4, calculateDaysLeft } from '../_lib/utils.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ status: false, message: 'Method Not Allowed' });

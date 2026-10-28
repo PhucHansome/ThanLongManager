@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { supabase } from '../_lib/supabase';
-import { verifyJWT } from '../_lib/auth';
+import { supabase } from '../_lib/supabase.js';
+import { verifyJWT } from '../_lib/auth.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ status: false, message: 'Method Not Allowed' });

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { supabase } from '../_lib/supabase';
-import { mapDbStatusToFrontend, mapFrontendStatusToDb } from '../_lib/utils';
+import { supabase } from '../_lib/supabase.js';
+import { mapDbStatusToFrontend, mapFrontendStatusToDb } from '../_lib/utils.js';
 
 const SEPAY_API_KEY = (process.env.SEPAY_API_KEY || '').trim();
 
