@@ -1,22 +1,23 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
+// Đã sửa lại đường dẫn khớp với tên file mới
 import loginHandler from './_auth/login';
 import registerHandler from './_auth/register';
 import meHandler from './_auth/me';
 import changePasswordHandler from './_auth/change-password';
 
 import adminUsersHandler from './_admin/users';
-import adminUserDetailHandler from './_admin/users/user-detail'; 
-import adminUserExtendHandler from './_admin/users/user-extend'; 
-import adminUserStatusHandler from './_admin/users/user-status'; 
+import adminUserDetailHandler from './_admin/users/user-detail'; // Sửa
+import adminUserExtendHandler from './_admin/users/user-extend'; // Sửa
+import adminUserStatusHandler from './_admin/users/user-status'; // Sửa
 
 import adminOrdersHandler from './_admin/orders';
 import adminStatsHandler from './_admin/stats';
-import adminRevenueHandler from './_admin/revenue';
+import adminRevenueHandler from './_admin/revenue.ts';
 import adminRevenueExportHandler from './_admin/revenue/export';
 
 import ordersCreateHandler from './_orders/create';
-import orderStatusHandler from './_orders/order-status'; 
+import orderStatusHandler from './_orders/order-status'; // Sửa
 
 import pricingHandler from './_pricing';
 import systemStatusHandler from './_system/status';
