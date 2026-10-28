@@ -70,6 +70,7 @@ export const UserManagement: React.FC = () => {
   const [newMonths, setNewMonths] = useState(1);
 
   const [extendMonths, setExtendMonths] = useState(1);
+  const [extendDays, setExtendDays] = useState<number | null>(null); // <-- Thêm dòng này
   const [lockReason, setLockReason] = useState('Vi phạm quy định sử dụng tool');
 
   const { showToast } = useToast();
@@ -155,9 +156,14 @@ export const UserManagement: React.FC = () => {
     if (!extendUser) return;
 
     try {
-      await apiAdminExtendLicense(extendUser.id, extendMonths);
-      showToast(`Đã gia hạn thành công ${extendMonths} tháng cho ${extendUser.username}`, 'success');
+      // Truyền thêm extendDays vào API
+      await apiAdminExtendLicense(extendUser.id, extendMonths, extendDays || undefined);
+      
+      const actionText = extendDays ? `Test ${extendDays} ngày` : `${extendMonths} tháng`;
+      showToast(`Đã gia hạn thành công ${actionText} cho ${extendUser.username}`, 'success');
+      
       setExtendUser(null);
+      setExtendDays(null); // Reset lại state
       fetchUsers();
     } catch (err: any) {
       showToast(err.message || 'Gia hạn thất bại', 'error');
@@ -890,8 +896,9 @@ export const UserManagement: React.FC = () => {
                 <label className="block text-zinc-300 mb-1.5 font-medium">Số Tháng Gia Hạn</label>
                 <select
                   value={extendMonths}
+                  disabled={!!extendDays} // Vô hiệu hóa nếu đang chọn Test Ngày
                   onChange={e => setExtendMonths(Number(e.target.value))}
-                  className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-zinc-100 font-medium"
+                  className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-zinc-100 font-medium disabled:opacity-50"
                 >
                   <option value={1}>1 Tháng (30 ngày)</option>
                   <option value={3}>3 Tháng (90 ngày)</option>
@@ -900,14 +907,42 @@ export const UserManagement: React.FC = () => {
                 </select>
               </div>
 
+              {/* THÊM 2 NÚT TEST VÀO ĐÂY */}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setExtendDays(1)}
+                  className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-colors ${
+                    extendDays === 1 
+                      ? 'bg-amber-500 text-zinc-950 border-amber-500' 
+                      : 'bg-zinc-900 text-amber-400 border-zinc-700 hover:border-amber-500'
+                  }`}
+                >
+                  Test 1 Ngày
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setExtendDays(3)}
+                  className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-colors ${
+                    extendDays === 3 
+                      ? 'bg-amber-500 text-zinc-950 border-amber-500' 
+                      : 'bg-zinc-900 text-amber-400 border-zinc-700 hover:border-amber-500'
+                  }`}
+                >
+                  Test 3 Ngày
+                </button>
+              </div>
+
               <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-[11px] text-zinc-400">
-                Nếu còn hạn, hệ thống sẽ tự động cộng tiếp từ ngày hết hạn hiện tại.
+                {extendDays 
+                  ? `Đang chọn gia hạn Test ${extendDays} ngày.` 
+                  : 'Nếu còn hạn, hệ thống sẽ tự động cộng tiếp từ ngày hết hạn hiện tại.'}
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => setExtendUser(null)}
+                  onClick={() => { setExtendUser(null); setExtendDays(null); }}
                   className="px-4 py-2 text-zinc-400 hover:text-zinc-200"
                 >
                   Hủy bỏ

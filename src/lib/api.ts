@@ -206,10 +206,10 @@ export const apiAdminSetUserStatus = async (id: string, status: number, locked_r
   });
 };
 
-export const apiAdminExtendLicense = async (id: string, months: number): Promise<void> => {
+export const apiAdminExtendLicense = async (id: string, months: number, days?: number): Promise<void> => {
   await apiRequest(`/api/admin/users/${id}/extend`, {
     method: 'POST',
-    body: JSON.stringify({ months })
+    body: JSON.stringify({ months, days }) // Thêm days vào đây
   });
 };
 
