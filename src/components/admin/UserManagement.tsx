@@ -742,7 +742,7 @@ export const UserManagement: React.FC = () => {
                   <label className="block text-zinc-300 mb-1 font-medium">Số Tháng License</label>
                   <input
                     type="number"
-                    min="1"
+                    min="0"
                     max="36"
                     value={newMonths}
                     onChange={e => setNewMonths(Number(e.target.value))}
