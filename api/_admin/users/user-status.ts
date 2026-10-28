@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { supabase } from '../../_lib/supabase.js';
-import { verifyJWT, requireAdmin } from '../../_lib/auth';    // Thêm 1 dấu ../ nữa
+import { verifyJWT, requireAdmin } from '../../_lib/auth.js';    // Thêm 1 dấu ../ nữa
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'PATCH') return res.status(405).end();
