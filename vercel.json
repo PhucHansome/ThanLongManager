@@ -11,16 +11,7 @@
   ],
   "functions": {
     "api/index.ts": {
-      "includeFiles": [
-        "api/_auth/**",
-        "api/_lib/**",
-        "api/_admin/**",
-        "api/_orders/**",
-        "api/_system/**",
-        "api/_user/**",
-        "api/_webhook/**",
-        "api/_pricing.ts"
-      ]
+      "includeFiles": "api/**/*"
     }
   }
 }
