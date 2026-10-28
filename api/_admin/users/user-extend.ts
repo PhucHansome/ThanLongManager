@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { supabase } from from '../../_lib/supabase.js'; // Thêm 1 dấu ../ nữa
+import { supabase } from '../../_lib/supabase.js';
 import { verifyJWT, requireAdmin } from '../../_lib/auth';    // Thêm 1 dấu ../ nữa
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
