@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { supabase } from '../../_lib/supabase';
-import { verifyJWT, requireAdmin } from '../../_lib/auth';
+import { supabase } from '../../../_lib/supabase'; // Thêm 1 dấu ../ nữa
+import { verifyJWT, requireAdmin } from '../../../_lib/auth';    // Thêm 1 dấu ../ nữa
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).end();
