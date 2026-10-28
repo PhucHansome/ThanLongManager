@@ -26,18 +26,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } 
   
   else if (req.method === 'POST') {
-    const { username, password, full_name, role, initial_months } = req.body;
+    // 1. Bổ sung thêm email vào destructuring
+    const { username, password, full_name, email, role, initial_months } = req.body;
     if (!username || !password) return res.status(400).json({ status: false, message: 'Thiếu thông tin' });
+    
     try {
-      const { data, error } = await supabase.rpc('fn_create_account', { p_username: username, p_password: password });
+      const { data, error } = await supabase.rpc('fn_create_account', {
+        p_username: username,
+        p_password: password,
+        p_full_name: full_name,
+        p_email: email, // Đã có biến email
+        p_role: role,
+        p_months: initial_months, // Truyền thẳng 0 nếu là 0
+      });
+      
       if (error) return res.status(500).json({ status: false, message: error.message });
       
       if (full_name || role) {
         await supabase.from('users').update({ full_name: full_name || username, role: role || 'user' }).eq('username', username);
       }
-      if (initial_months > 0) {
-        await supabase.rpc('fn_extend_license', { p_username: username, p_months: initial_months });
-      }
+
+      // 2. ĐÃ XÓA ĐOẠN GỌI fn_extend_license Ở ĐÂY VÌ KHÔNG CẦN THIẾT
+
       res.json({ status: true, message: 'Tạo thành công' });
     } catch (err: any) { res.status(500).json({ status: false, message: err.message }); }
   } else {
