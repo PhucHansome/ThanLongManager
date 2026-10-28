@@ -30,17 +30,22 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
     headers
   });
 
-  if (!response.ok) {
-    // Thử đọc dưới dạng JSON trước (vì Backend trả về { status: false, message: "..." })
-    try {
+    if (!response.ok) {
+    // Lấy Content-Type để biết server trả về JSON hay HTML
+    const contentType = response.headers.get("content-type");
+    
+    // Nếu là JSON (lỗi 400, 500 từ Backend có message rõ ràng)
+    if (contentType && contentType.includes("application/json")) {
       const errorData = await response.json();
       throw new Error(errorData.message || `Lỗi kết nối (${response.status})`);
-    } catch (jsonErr: any) {
-      // Nếu không phải JSON (VD: lỗi HTML của Vercel), báo lỗi hệ thống
-      const errorText = await response.text();
-      console.error("API Error:", response.status, errorText);
-      throw new Error(`Lỗi hệ thống (${response.status}). Vui lòng thử lại!`);
+    } 
+    
+    // Nếu là HTML (lỗi 404, 405 của Vercel)
+    const errorText = await response.text();
+    if (errorText.includes('<!DOCTYPE html>')) {
+      throw new Error(`Lỗi hệ thống (${response.status}): API chưa được cấu hình đúng.`);
     }
+    throw new Error(`Lỗi kết nối (${response.status}). Vui lòng thử lại!`);
   }
 
   // 2. Nếu thành công (200), tiến hành đọc JSON

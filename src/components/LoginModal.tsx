@@ -170,34 +170,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           <p className="text-xs text-zinc-400 mt-1">Cổng Quản Lý Bản Quyền Tool & Tự Động Gia Hạn VietQR</p>
         </div>
 
-        {/* Database Connection Status Banner */}
-        <div className="mb-4 p-3 rounded-2xl border text-xs backdrop-blur-md">
-          {sysStatus?.connected ? (
-            <div className="flex items-start gap-2.5 text-emerald-400 bg-emerald-950/20 border-emerald-800/40 p-1">
-              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
-              <div>
-                <div className="font-semibold text-emerald-300">Đã kết nối Supabase RPC thành công</div>
-                <div className="text-[11px] text-zinc-400 mt-0.5">
-                  Host: <span className="font-mono text-zinc-300">{sysStatus.supabase_url}</span>
-                  {typeof sysStatus.real_users_count === 'number' && (
-                    <span> · {sysStatus.real_users_count} tài khoản</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-start gap-2.5 text-amber-400 bg-amber-950/20 border-amber-800/40 p-1">
-              <Database className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
-              <div>
-                <div className="font-semibold text-amber-300">Kết nối cơ sở dữ liệu Supabase</div>
-                <div className="text-[11px] text-zinc-400 mt-0.5">
-                  Tự động lưu địa chỉ IPv4 lúc đăng ký/đăng nhập
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
         {/* Main Card with Tabs */}
         <div className="bg-zinc-900/90 border border-zinc-800 rounded-3xl p-6 sm:p-7 shadow-2xl backdrop-blur-xl">
           {/* Tabs: Đăng nhập / Đăng ký */}
