@@ -30,13 +30,28 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
     headers
   });
 
-  const data = await response.json();
-
-  if (!response.ok || data.status === false) {
-    throw new Error(data.message || 'Yêu cầu không thành công');
+  // 1. Kiểm tra nếu server trả về lỗi (như 405, 404, 500)
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("API Error:", response.status, errorText);
+    
+    // Nếu server trả về HTML (như lỗi 405 của Vercel), báo lỗi rõ ràng
+    if (errorText.includes('<!DOCTYPE html>')) {
+       throw new Error(`Lỗi hệ thống (${response.status}): API chưa được cấu hình đúng.`);
+    }
+    throw new Error(`Lỗi kết nối (${response.status}). Vui lòng thử lại!`);
   }
 
-  return data;
+  // 2. Nếu thành công (200), tiến hành đọc JSON
+  try {
+    const data = await response.json();
+    if (data.status === false) {
+      throw new Error(data.message || 'Yêu cầu không thành công');
+    }
+    return data;
+  } catch (err: any) {
+    throw new Error('Dữ liệu trả về không hợp lệ.');
+  }
 }
 
 // System Status
