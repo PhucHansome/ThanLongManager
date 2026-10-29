@@ -24,6 +24,8 @@ import userMachinesHandler from './_user/machines.js';
 import webhookSepayHandler from './_webhook/sepay.js';
 import webhookSimulateHandler from './_webhook/simulate-payment.js';
 
+import systemVersionHandler from './_system/version.js';
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const url = req.url || '';
   const path = url.replace(/^\/api/, '').split('?')[0];
@@ -64,9 +66,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 5. Các route lẻ
   if (path === '/pricing') return pricingHandler(req, res);
   if (path === '/system/status') return systemStatusHandler(req, res);
+  if (path === '/system/version') return systemVersionHandler(req, res);
   if (path === '/user/machines') return userMachinesHandler(req, res);
   if (path === '/webhook/sepay') return webhookSepayHandler(req, res);
   if (path === '/webhook/simulate-payment') return webhookSimulateHandler(req, res);
+
+
 
   return res.status(404).json({ status: false, message: `API route not found: ${path}` });
 }

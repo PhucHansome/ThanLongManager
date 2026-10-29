@@ -72,6 +72,11 @@ export const apiGetSystemStatus = async (): Promise<{
   return res.json();
 };
 
+export const apiGetAppVersion = async (): Promise<{ update_url: string; latest_version: string }> => {
+  const res = await fetch('/api/system/version');
+  return res.json();
+};
+
 let cachedClientIPv4: string | undefined = undefined;
 
 // Lấy địa chỉ public IPv4 từ trình duyệt nếu có (timeout 1s)

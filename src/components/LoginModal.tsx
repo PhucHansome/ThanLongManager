@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { apiLogin, apiRegister, apiGetSystemStatus } from '../lib/api';
 import { AuthSession } from '../types';
 import { useToast } from './ui/Toast';
+import { apiGetAppVersion } from '../../lib/api';
 import {
   Terminal,
   Lock,
@@ -29,7 +30,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onClose
 }) => {
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
-
+  const [showGuide, setShowGuide] = useState(false);
   // Login form state
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -51,6 +52,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     real_users_count?: number;
     message?: string;
   } | null>(null);
+
+  const [downloadUrl, setDownloadUrl] = useState('https://drive.google.com/file/d/1hLtyBcm8edK4vgmg3OcwdL1m-nJFD-EA/view?usp=sharing');
 
   const { showToast } = useToast();
 
@@ -82,6 +85,20 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       setLoginLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchVersion = async () => {
+      try {
+        const res = await apiGetAppVersion();
+        if (res.update_url) {
+          setDownloadUrl(res.update_url);
+        }
+      } catch (err) {
+        console.error("Lỗi lấy link tải:", err);
+      }
+    };
+    fetchVersion();
+  }, []);
 
   // Handle Register Submit
   const handleRegisterSubmit = async (e: React.FormEvent) => {
@@ -145,20 +162,42 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       <div className="absolute bottom-1/4 left-1/3 w-80 h-80 bg-rose-500/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10">
-        {/* Top Action Bar with YouTube Guide Link */}
-        <div className="mb-4 flex items-center justify-between">
-          <a
-            href="https://www.youtube.com"
-            target="_blank"
+        {/* Top Action Bar: Nút Tải Xuống & Hướng Dẫn */}
+        <div className="flex items-center justify-center gap-3 mb-4">
+          {/* Nút Tải Xuống - Thay link href bằng link thực tế của bạn */}
+          <a 
+            href={downloadUrl} // <-- Thay link tĩnh bằng biến downloadUrl
+            target="_blank" 
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-rose-400 hover:text-rose-300 px-3.5 py-1.5 rounded-xl bg-rose-950/40 border border-rose-800/60 hover:border-rose-700 transition-all shadow-sm cursor-pointer"
+            className="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-xs rounded-xl shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2"
           >
-            <Youtube className="w-4 h-4 text-rose-500" />
-            <span>📺 Hướng Dẫn Về Tool (YouTube)</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            Tải Tool Ngay
           </a>
-          <span className="text-[11px] text-zinc-500 font-mono">Phiên Bản 2026</span>
+
+          {/* Nút Bung Hướng Dẫn */}
+          <button
+            type="button"
+            onClick={() => setShowGuide(!showGuide)}
+            className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium text-xs rounded-xl border border-zinc-700 transition-all flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            {showGuide ? 'Đóng Hướng Dẫn' : 'Hướng Dẫn Sử Dụng'}
+          </button>
         </div>
 
+        {/* Khu vực bung Hướng Dẫn */}
+        {showGuide && (
+          <div className="w-full max-w-md mx-auto mb-4 p-4 bg-zinc-900/90 border border-zinc-700 rounded-2xl animate-in fade-in slide-in-from-top-4 text-left">
+            <h3 className="text-amber-500 font-bold mb-2 text-xs">📖 Hướng dẫn sử dụng Tool</h3>
+            <div className="text-[11px] text-zinc-300 space-y-2">
+              <p><strong>Bước 1:</strong> Tải Tool bằng nút phía trên và giải nén.</p>
+              <p><strong>Bước 2:</strong> Chạy file <code className="bg-zinc-800 px-1 rounded">ThanLongAuto.exe</code> với quyền Administrator.</p>
+              <p><strong>Bước 3:</strong> Đăng nhập bằng tài khoản bạn vừa tạo trên Website.</p>
+              <p className="text-amber-200/80 italic mt-1">*Lưu ý: Tài khoản cần được Gia hạn License để có thể sử dụng Tool.</p>
+            </div>
+          </div>
+        )}
         {/* Brand Header */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-400 text-zinc-950 shadow-xl shadow-amber-500/15 mb-3">
