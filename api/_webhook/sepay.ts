@@ -1,120 +1,95 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { supabase } from '../_lib/supabase.js';
-import crypto from 'crypto';
+import { supabase } from '../_lib/supabase.js'; // ⭐ THÊM DÒNG NÀY
 
-const SEPAY_WEBHOOK_SECRET = (process.env.SEPAY_WEBHOOK_SECRET || '').trim();
+const SEPAY_API_KEY = (process.env.SEPAY_API_KEY || '').trim();
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ status: false, message: 'Method Not Allowed' });
   }
 
-  // 1. XÁC THỰC HMAC-SHA256 (Bảo mật tuyệt đối)
-  if (SEPAY_WEBHOOK_SECRET) {
-    const signature = req.headers['x-sepay-signature'] as string;
-    const timestamp = Number(req.headers['x-sepay-timestamp'] || 0);
+  // 1. XÁC THỰC API KEY
+  if (SEPAY_API_KEY) {
+    const authHeader = req.headers.authorization;
+    const apiKey = authHeader ? authHeader.replace(/^Apikey\s+/i, '').replace(/^Bearer\s+/i, '').trim() : '';
     
-    if (!signature) {
-      return res.status(401).json({ status: false, message: 'Thiếu chữ ký xác thực' });
+    if (apiKey !== SEPAY_API_KEY) {
+      return res.status(401).json({ status: false, message: 'Sai API Key xác thực SePay' });
     }
-
-    // Lấy raw body để tính chữ ký
-    const rawBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
-    const payloadToSign = `${timestamp}.${rawBody}`;
-    
-    const expectedSignature = crypto
-      .createHmac('sha256', SEPAY_WEBHOOK_SECRET)
-      .update(payloadToSign)
-      .digest('hex');
-
-    // So sánh an toàn
-    if (signature.length !== expectedSignature.length || 
-        !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
-      return res.status(401).json({ status: false, message: 'Chữ ký không hợp lệ' });
-    }
-  } else {
-    console.warn("⚠️ CẢNH BÁO: Chưa cấu hình SEPAY_WEBHOOK_SECRET. Webhook đang ở trạng thái không bảo mật!");
   }
 
-  // 2. Trích xuất thông tin giao dịch từ payload SePay
+  // 2. Trích xuất thông tin giao dịch
   const bank_txn_id = req.body?.id || req.body?.bank_txn_id || `TXN-${Date.now()}`;
   const amount = Number(req.body?.transferAmount ?? req.body?.amount ?? 0);
-  const transferType = req.body?.transferType; // 'in' là tiền vào, 'out' là tiền ra
+  const transferType = req.body?.transferType; 
   const content = String(req.body?.content || req.body?.description || '');
 
-  // Bỏ qua giao dịch tiền ra
   if (transferType === 'out') {
     return res.json({ status: true, message: 'Bỏ qua giao dịch chuyển tiền ra' });
   }
 
   if (!amount || amount <= 0) {
-    return res.status(400).json({ status: false, message: 'Thiếu dữ liệu số tiền giao dịch' });
-  }
-
-  // 3. CHỐNG TRÙNG LẶP: Kiểm tra xem giao dịch này đã được xử lý chưa
-  const { data: existingTxn } = await supabase
-    .from('bank_transactions')
-    .select('id')
-    .eq('bank_txn_id', String(bank_txn_id))
-    .maybeSingle();
-
-  if (existingTxn) {
-    // Đã xử lý rồi, trả về thành công luôn để SePay không gửi lại nữa
-    return res.json({ status: true, message: 'Giao dịch này đã được xử lý trước đó' });
-  }
-
-  // 4. Trích xuất mã đơn hàng (Format: TLBB + chữ/số)
-  const match = content.toUpperCase().match(/\b(TLBB[A-Z0-9]{4,12})\b/);
-  const extractedOrderCode = match ? match[1] : null;
-
-  if (!extractedOrderCode) {
-    await supabase.from('bank_transactions').insert({
-      bank_txn_id: String(bank_txn_id),
-      amount: amount,
-      description: `${content} [KHÔNG TÌM THẤY MÃ ĐƠN]`,
-      raw_payload: req.body
-    });
-    return res.json({ status: true, message: 'Ghi nhận giao dịch nhưng không tìm thấy mã đơn hàng' });
+    return res.status(400).json({ status: false, message: 'Thiếu dữ liệu số tiền' });
   }
 
   try {
-    // 5. Tìm đơn hàng tương ứng trong payment_orders
-    const { data: order, error: orderErr } = await supabase
+    // 3. CHỐNG TRÙNG LẶP
+    const { data: existingTxn } = await supabase
+      .from('bank_transactions')
+      .select('id')
+      .eq('bank_txn_id', String(bank_txn_id))
+      .maybeSingle();
+
+    if (existingTxn) {
+      return res.json({ status: true, message: 'Giao dịch đã xử lý' });
+    }
+
+    // 4. Trích xuất mã đơn
+    const match = content.toUpperCase().match(/\b(TLBB[A-Z0-9]{4,12})\b/);
+    const extractedOrderCode = match ? match[1] : null;
+
+    if (!extractedOrderCode) {
+      await supabase.from('bank_transactions').insert({
+        bank_txn_id: String(bank_txn_id),
+        amount: amount,
+        description: `${content} [KHÔNG TÌM THẤY MÃ ĐƠN]`,
+        raw_payload: req.body
+      });
+      return res.json({ status: true, message: 'Ghi nhận nhưng không có mã đơn' });
+    }
+
+    // 5. Xử lý đơn hàng
+    const { data: order } = await supabase
       .from('payment_orders')
       .select('*')
       .eq('order_code', extractedOrderCode)
       .maybeSingle();
 
-    if (orderErr || !order) {
+    if (!order) {
       await supabase.from('bank_transactions').insert({
         bank_txn_id: String(bank_txn_id),
         amount: amount,
-        description: `${content} [ĐƠN HÀNG KHÔNG TỒN TẠI: ${extractedOrderCode}]`,
+        description: `${content} [ĐƠN KHÔNG TỒN TẠI: ${extractedOrderCode}]`,
         raw_payload: req.body
       });
-      return res.status(404).json({ status: false, message: `Không tìm thấy đơn hàng ${extractedOrderCode}` });
+      return res.status(404).json({ status: false, message: `Không thấy đơn ${extractedOrderCode}` });
     }
 
-    // Đã thanh toán (status = 1 hoặc 'paid')
     if (order.status === 1 || order.status === 'paid') {
-      return res.json({ status: true, message: 'Đơn hàng này đã được thanh toán và kích hoạt trước đó' });
+      return res.json({ status: true, message: 'Đơn đã thanh toán' });
     }
 
-    // 6. Kiểm tra số tiền chuyển so với giá trị đơn hàng
     if (amount < Number(order.amount)) {
       await supabase.from('bank_transactions').insert({
         bank_txn_id: String(bank_txn_id),
         amount: amount,
-        description: `${content} [CHUYỂN THIẾU TIỀN: nhận ${amount}, cần ${order.amount}]`,
+        description: `${content} [THIẾU TIỀN]`,
         raw_payload: req.body
       });
-      return res.status(400).json({
-        status: false,
-        message: `Số tiền chuyển (${amount} đ) không đủ giá trị đơn hàng (${order.amount} đ)`
-      });
+      return res.status(400).json({ status: false, message: 'Chuyển thiếu tiền' });
     }
 
-    // 7. Ghi nhận giao dịch ngân hàng
+    // 6. Ghi nhận và cập nhật
     await supabase.from('bank_transactions').insert({
       bank_txn_id: String(bank_txn_id),
       amount: amount,
@@ -122,73 +97,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       raw_payload: req.body
     });
 
-    // 8. Cập nhật trạng thái đơn hàng -> 1 (paid)
-    await supabase
-      .from('payment_orders')
-      .update({
-        status: 1, // 1: paid
+    await supabase.from('payment_orders').update({
+        status: 1,
         paid_at: new Date().toISOString(),
         bank_txn_id: String(bank_txn_id)
-      })
-      .eq('id', order.id);
+      }).eq('id', order.id);
 
-    // 9. Tự động gia hạn License cho User
-    const { data: u } = await supabase.from('users').select('id, username').eq('id', order.user_id).maybeSingle();
+    // 7. Gia hạn License
+    const { data: u } = await supabase.from('users').select('username').eq('id', order.user_id).maybeSingle();
     const targetUsername = u?.username || 'user';
 
-    let extendSuccess = false;
-
-    // Thử gọi RPC fn_extend_license theo p_user_id
-    const rpc1 = await supabase.rpc('fn_extend_license', {
-      p_user_id: order.user_id,
-      p_months: Number(order.months)
-    });
-    if (!rpc1.error) {
-      extendSuccess = true;
-    } else {
-      // Fallback: Thử gọi theo p_username
-      const rpc2 = await supabase.rpc('fn_extend_license', {
-        p_username: targetUsername,
-        p_months: Number(order.months)
-      });
-      if (!rpc2.error) {
-        extendSuccess = true;
-      }
+    const rpc1 = await supabase.rpc('fn_extend_license', { p_user_id: order.user_id, p_months: Number(order.months) });
+    if (rpc1.error) {
+      await supabase.rpc('fn_extend_license', { p_username: targetUsername, p_months: Number(order.months) });
     }
 
-    // Fallback cấp độ 2: Cập nhật trực tiếp bảng licenses
-    if (!extendSuccess) {
-      const { data: lic } = await supabase
-        .from('licenses')
-        .select('*')
-        .eq('user_id', order.user_id)
-        .eq('delflag', false)
-        .order('end_date', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      let newEnd = new Date();
-      if (lic && new Date(lic.end_date).getTime() > Date.now()) {
-        newEnd = new Date(lic.end_date);
-      }
-      newEnd.setMonth(newEnd.getMonth() + Number(order.months));
-
-      if (lic) {
-        await supabase
-          .from('licenses')
-          .update({ end_date: newEnd.toISOString(), status: 1, updtime: new Date().toISOString() })
-          .eq('id', lic.id);
-      } else {
-        await supabase.from('licenses').insert({
-          user_id: order.user_id,
-          start_date: new Date().toISOString(),
-          end_date: newEnd.toISOString(),
-          status: 1
-        });
-      }
-    }
-
-    // 10. Ghi sổ cái doanh thu
+    // 8. Sổ cái doanh thu
     const now = new Date();
     await supabase.from('revenue_ledger').insert({
       order_id: order.id,
@@ -200,12 +124,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       year: now.getFullYear()
     });
 
-    return res.json({
-      status: true,
-      message: 'Xác nhận thanh toán và tự động gia hạn thành công!',
-      order_code: extractedOrderCode
-    });
+    return res.json({ status: true, message: 'Thanh toán và gia hạn thành công!' });
   } catch (err: any) {
-    return res.status(500).json({ status: false, message: err.message || 'Lỗi xử lý webhook' });
+    console.error("Lỗi xử lý webhook SePay:", err);
+    return res.status(500).json({ status: false, message: err.message });
   }
 }
