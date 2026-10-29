@@ -1,19 +1,39 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { supabase } from '../_lib/supabase.js';
-import { mapDbStatusToFrontend, mapFrontendStatusToDb } from '../_lib/utils.js';
+import crypto from 'crypto';
 
-const SEPAY_API_KEY = (process.env.SEPAY_API_KEY || '').trim();
+const SEPAY_WEBHOOK_SECRET = (process.env.SEPAY_WEBHOOK_SECRET || '').trim();
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ status: false, message: 'Method Not Allowed' });
   }
 
-  // 1. Xác thực SePay API Key (nếu có cấu hình trong .env)
-  const authHeader = req.headers.authorization;
-  const apiKey = authHeader ? authHeader.replace(/^Apikey\s+/i, '').replace(/^Bearer\s+/i, '').trim() : '';
-  if (SEPAY_API_KEY && apiKey !== SEPAY_API_KEY) {
-    return res.status(401).json({ status: false, message: 'Sai API Key xác thực SePay' });
+  // 1. XÁC THỰC HMAC-SHA256 (Bảo mật tuyệt đối)
+  if (SEPAY_WEBHOOK_SECRET) {
+    const signature = req.headers['x-sepay-signature'] as string;
+    const timestamp = Number(req.headers['x-sepay-timestamp'] || 0);
+    
+    if (!signature) {
+      return res.status(401).json({ status: false, message: 'Thiếu chữ ký xác thực' });
+    }
+
+    // Lấy raw body để tính chữ ký
+    const rawBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+    const payloadToSign = `${timestamp}.${rawBody}`;
+    
+    const expectedSignature = crypto
+      .createHmac('sha256', SEPAY_WEBHOOK_SECRET)
+      .update(payloadToSign)
+      .digest('hex');
+
+    // So sánh an toàn
+    if (signature.length !== expectedSignature.length || 
+        !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
+      return res.status(401).json({ status: false, message: 'Chữ ký không hợp lệ' });
+    }
+  } else {
+    console.warn("⚠️ CẢNH BÁO: Chưa cấu hình SEPAY_WEBHOOK_SECRET. Webhook đang ở trạng thái không bảo mật!");
   }
 
   // 2. Trích xuất thông tin giao dịch từ payload SePay
@@ -31,7 +51,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ status: false, message: 'Thiếu dữ liệu số tiền giao dịch' });
   }
 
-  // 3. Trích xuất mã đơn hàng (Format: TLBB + chữ/số)
+  // 3. CHỐNG TRÙNG LẶP: Kiểm tra xem giao dịch này đã được xử lý chưa
+  const { data: existingTxn } = await supabase
+    .from('bank_transactions')
+    .select('id')
+    .eq('bank_txn_id', String(bank_txn_id))
+    .maybeSingle();
+
+  if (existingTxn) {
+    // Đã xử lý rồi, trả về thành công luôn để SePay không gửi lại nữa
+    return res.json({ status: true, message: 'Giao dịch này đã được xử lý trước đó' });
+  }
+
+  // 4. Trích xuất mã đơn hàng (Format: TLBB + chữ/số)
   const match = content.toUpperCase().match(/\b(TLBB[A-Z0-9]{4,12})\b/);
   const extractedOrderCode = match ? match[1] : null;
 
@@ -46,7 +78,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // 4. Tìm đơn hàng tương ứng trong payment_orders
+    // 5. Tìm đơn hàng tương ứng trong payment_orders
     const { data: order, error: orderErr } = await supabase
       .from('payment_orders')
       .select('*')
@@ -68,7 +100,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.json({ status: true, message: 'Đơn hàng này đã được thanh toán và kích hoạt trước đó' });
     }
 
-    // 5. Kiểm tra số tiền chuyển so với giá trị đơn hàng
+    // 6. Kiểm tra số tiền chuyển so với giá trị đơn hàng
     if (amount < Number(order.amount)) {
       await supabase.from('bank_transactions').insert({
         bank_txn_id: String(bank_txn_id),
@@ -82,7 +114,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // 6. Ghi nhận giao dịch ngân hàng
+    // 7. Ghi nhận giao dịch ngân hàng
     await supabase.from('bank_transactions').insert({
       bank_txn_id: String(bank_txn_id),
       amount: amount,
@@ -90,7 +122,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       raw_payload: req.body
     });
 
-    // 7. Cập nhật trạng thái đơn hàng -> 1 (paid)
+    // 8. Cập nhật trạng thái đơn hàng -> 1 (paid)
     await supabase
       .from('payment_orders')
       .update({
@@ -100,7 +132,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })
       .eq('id', order.id);
 
-    // 8. Tự động gia hạn License cho User
+    // 9. Tự động gia hạn License cho User
     const { data: u } = await supabase.from('users').select('id, username').eq('id', order.user_id).maybeSingle();
     const targetUsername = u?.username || 'user';
 
@@ -156,7 +188,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    // 9. Ghi sổ cái doanh thu
+    // 10. Ghi sổ cái doanh thu
     const now = new Date();
     await supabase.from('revenue_ledger').insert({
       order_id: order.id,
