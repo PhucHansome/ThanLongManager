@@ -193,6 +193,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               <p><strong>Bước 1:</strong> Tải Tool bằng nút phía trên và giải nén.</p>
               <p><strong>Bước 2:</strong> Chạy file <code className="bg-zinc-800 px-1 rounded">ThanLongAuto.exe</code> với quyền Administrator.</p>
               <p><strong>Bước 3:</strong> Đăng nhập bằng tài khoản bạn vừa tạo trên Website.</p>
+              <p><strong>Có file hướng dẫn về tool ở trong folder Nén</strong> HƯỚNG DẪN SỬ DỤNG TOOL THẦN LONG MOBILE AUTO PRO.docx</p>
               <p className="text-amber-200/80 italic mt-1">*Lưu ý: Tài khoản cần được Gia hạn License để có thể sử dụng Tool.</p>
             </div>
           </div>
