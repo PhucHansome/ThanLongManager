@@ -205,7 +205,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           <h1 className="text-2xl font-bold tracking-tight text-zinc-100">
             Thần Long Mobile <span className="text-amber-400">Auto Pro</span>
           </h1>
-          <p className="text-xs text-zinc-400 mt-1">Cổng Quản Lý Bản Quyền Tool & Tự Động Gia Hạn VietQR</p>
         </div>
 
         {/* Main Card with Tabs */}
@@ -243,10 +242,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             /* ================= FORM ĐĂNG NHẬP ================= */
             <form onSubmit={handleLoginSubmit} className="space-y-4">
               <div className="mb-4">
-                <h2 className="text-base font-semibold text-zinc-100">Đăng Nhập Quản Lý</h2>
-                <p className="text-xs text-zinc-400 mt-0.5">
-                  Xác thực trực tiếp bằng hàm RPC <code className="font-mono text-amber-400">fn_web_login</code>
-                </p>
+                <h2 className="text-base font-semibold text-zinc-100">Đăng Nhập</h2>
               </div>
 
               <div>

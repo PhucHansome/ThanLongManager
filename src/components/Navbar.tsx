@@ -105,18 +105,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Zone 3: Primary action & User profile */}
         <div className="flex items-center gap-4 shrink-0">
-          {/* Link YouTube Hướng Dẫn */}
-          <a
-            href="https://www.youtube.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Xem Video Hướng Dẫn Về Tool Trên YouTube"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-400 bg-rose-950/40 hover:bg-rose-900/40 transition-colors border border-rose-800/60 cursor-pointer"
-          >
-            <Youtube className="w-3.5 h-3.5 text-rose-500" />
-            <span className="hidden sm:inline">Hướng Dẫn Về Tool</span>
-          </a>
-
           {user && (
             <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs">
               {user.role === 'admin' ? (
