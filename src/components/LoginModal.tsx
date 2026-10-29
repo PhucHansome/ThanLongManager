@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { apiLogin, apiRegister, apiGetSystemStatus } from '../lib/api';
+import { apiLogin, apiRegister, apiGetSystemStatus, apiGetAppVersion } from '../lib/api';
 import { AuthSession } from '../types';
 import { useToast } from './ui/Toast';
-import { apiGetAppVersion } from '../../lib/api';
 import {
   Terminal,
   Lock,
