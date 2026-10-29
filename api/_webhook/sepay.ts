@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { supabase } from '../_lib/supabase.js'; // ⭐ THÊM DÒNG NÀY
+import { supabase } from '../_lib/supabase.js';
 
 const SEPAY_API_KEY = (process.env.SEPAY_API_KEY || '').trim();
 
@@ -12,17 +12,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (SEPAY_API_KEY) {
     const authHeader = req.headers.authorization;
     const apiKey = authHeader ? authHeader.replace(/^Apikey\s+/i, '').replace(/^Bearer\s+/i, '').trim() : '';
-    
     if (apiKey !== SEPAY_API_KEY) {
       return res.status(401).json({ status: false, message: 'Sai API Key xác thực SePay' });
     }
   }
 
-  // 2. Trích xuất thông tin giao dịch
+  // 2. Trích xuất thông tin
   const bank_txn_id = req.body?.id || req.body?.bank_txn_id || `TXN-${Date.now()}`;
   const amount = Number(req.body?.transferAmount ?? req.body?.amount ?? 0);
   const transferType = req.body?.transferType; 
   const content = String(req.body?.content || req.body?.description || '');
+
+  // ⭐ IN RA LOG ĐỂ DEBUG XEM SEPAY GỬI GÌ LÊN
+  console.log("Dữ liệu SePay gửi lên:", req.body);
 
   if (transferType === 'out') {
     return res.json({ status: true, message: 'Bỏ qua giao dịch chuyển tiền ra' });
@@ -44,9 +46,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.json({ status: true, message: 'Giao dịch đã xử lý' });
     }
 
-    // 4. Trích xuất mã đơn
-    const match = content.toUpperCase().match(/\b(TLBB[A-Z0-9]{4,12})\b/);
-    const extractedOrderCode = match ? match[1] : null;
+    // 4. TRÍCH XUẤT MÃ ĐƠN (Sửa lại Regex không dùng \b)
+    let extractedOrderCode = req.body?.code || null; // Ưu tiên lấy mã SePay tự bóc tách
+    
+    if (!extractedOrderCode) {
+      // Tìm chuỗi TLBB... ở bất kỳ đâu trong nội dung (kể cả dính liền chữ)
+      const match = content.toUpperCase().match(/(TLBB[A-Z0-9]{4,12})/);
+      extractedOrderCode = match ? match[1] : null;
+    }
 
     if (!extractedOrderCode) {
       await supabase.from('bank_transactions').insert({
@@ -89,7 +96,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ status: false, message: 'Chuyển thiếu tiền' });
     }
 
-    // 6. Ghi nhận và cập nhật
+    // 6. Cập nhật Database
     await supabase.from('bank_transactions').insert({
       bank_txn_id: String(bank_txn_id),
       amount: amount,
@@ -126,7 +133,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.json({ status: true, message: 'Thanh toán và gia hạn thành công!' });
   } catch (err: any) {
-    console.error("Lỗi xử lý webhook SePay:", err);
+    console.error("Lỗi xử lý webhook:", err);
     return res.status(500).json({ status: false, message: err.message });
   }
 }
