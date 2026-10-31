@@ -45,9 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         
         {/* Zone 1: Logo & Tên Tool (Dùng chung cho cả Admin và User) */}
         <div className="flex items-center gap-3 shrink-0">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center text-zinc-950 shadow-md shadow-amber-500/10">
-            <Terminal className="w-5 h-5 font-bold" />
-          </div>
+          <img src="/icon.ico" alt="Logo" className="w-10 h-10 object-contain drop-shadow-md" />
           <div className="flex flex-col">
             <span className="text-base font-bold tracking-tight text-zinc-100 whitespace-nowrap">
               Thần Long Mobile <span className="text-amber-400 font-semibold text-xs tracking-wider">AUTO PRO</span>
