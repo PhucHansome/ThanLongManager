@@ -139,7 +139,8 @@ export const OrderManagement: React.FC = () => {
 
                     {/* Customer */}
                     <td className="py-3 px-4">
-                      <div className="font-semibold text-zinc-200">{order.username || 'user'}</div>
+                      <div className="font-semibold text-zinc-200">{order.username}</div>
+                      {order.full_name && <div className="text-[10px] text-zinc-500">{order.full_name}</div>}
                     </td>
 
                     {/* Months */}
@@ -154,17 +155,24 @@ export const OrderManagement: React.FC = () => {
 
                     {/* Status */}
                     <td className="py-3 px-4">
-                      {order.status === 'paid' ? (
+                      {(order.status === 1 || order.status === 'paid') ? (
                         <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
                           <CheckCircle2 className="w-3 h-3" /> Đã nạp
                         </span>
-                      ) : order.status === 'pending' ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
-                          <Clock className="w-3 h-3" /> Chờ quét QR
-                        </span>
+                      ) : (order.status === 0 || order.status === 'pending') ? (
+                        // Kiểm tra xem đơn đã quá hạn 15p chưa
+                        new Date(order.expires_at).getTime() < Date.now() ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-zinc-400 bg-zinc-500/10 border border-zinc-500/20 px-2 py-0.5 rounded-md">
+                            <AlertTriangle className="w-3 h-3" /> Quá hạn
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
+                            <Clock className="w-3 h-3" /> Chờ quét QR
+                          </span>
+                        )
                       ) : (
                         <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md">
-                          <AlertTriangle className="w-3 h-3" /> Quá hạn
+                          <AlertTriangle className="w-3 h-3" /> Đã hủy
                         </span>
                       )}
                     </td>
