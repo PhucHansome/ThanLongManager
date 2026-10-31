@@ -44,39 +44,51 @@ function MainApp() {
     checkAuth();
   }, []);
 
+    // ⭐ BẮT ĐẦU: CHẶN F12 VÀ CÁC PHÍM TẮT XEM MÃ NGUỒN
   useEffect(() => {
+    let lastWarningTime = 0; // Biến dùng để chống spam thông báo
+
+    const showWarning = () => {
+      const now = Date.now();
+      // Chỉ hiện thông báo nếu lần cuối hiện cách đây hơn 3 giây (3000ms)
+      if (now - lastWarningTime > 3000) {
+        showToast('⚠️ Hành vi mở DevTools đã bị vô hiệu hóa vì lý do bảo mật!', 'error');
+        lastWarningTime = now;
+      }
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
       // 1. Chặn phím F12
       if (e.key === 'F12' || e.keyCode === 123) {
         e.preventDefault();
-        alert('⚠️ CẢNH BÁO: Hành vi mở DevTools (F12) đã bị vô hiệu hóa vì lý do bảo mật!');
+        showWarning();
         return false;
       }
 
-      // 2. Chặn tổ hợp Ctrl + Shift + I / J / C (Mở DevTools)
+      // 2. Chặn tổ hợp Ctrl + Shift + I / J / C
       if (
         (e.ctrlKey || e.metaKey) &&
         e.shiftKey &&
         (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)
       ) {
         e.preventDefault();
-        alert('⚠️ CẢNH BÁO: Hành vi mở DevTools đã bị vô hiệu hóa vì lý do bảo mật!');
+        showWarning();
         return false;
       }
 
       // 3. Chặn Ctrl + U (Xem mã nguồn trang)
       if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
         e.preventDefault();
-        alert('⚠️ CẢNH BÁO: Hành vi xem mã nguồn trang đã bị vô hiệu hóa vì lý do bảo mật!');
+        showWarning();
         return false;
       }
     };
 
-    // 4. Chặn chuột phải (Context Menu)
+    // 4. Chặn chuột phải
     const handleContextMenu = (e: MouseEvent) => {
       e.preventDefault();
-      // Bạn có thể bỏ comment dòng dưới nếu muốn hiện thông báo cả khi chuột phải
-      // alert('⚠️ CẢNH BÁO: Chuột phải đã bị vô hiệu hóa!'); 
+      // Nếu muốn hiện thông báo khi bấm chuột phải, bạn bỏ comment dòng dưới:
+      // showWarning();
     };
 
     document.addEventListener('keydown', handleKeyDown);
@@ -86,7 +98,7 @@ function MainApp() {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('contextmenu', handleContextMenu);
     };
-  }, []);
+  }, [showToast]);
   // ⭐ KẾT THÚC: CHẶN F12
 
   const handleLoginSuccess = (newSession: AuthSession) => {
