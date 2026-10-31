@@ -79,7 +79,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         description: `${content} [ĐƠN KHÔNG TỒN TẠI: ${extractedOrderCode}]`,
         raw_payload: req.body
       });
-      return res.status(404).json({ status: false, message: `Không thấy đơn ${extractedOrderCode}` });
+       return res.json({ status: true, message: `Ghi nhận giao dịch, nhưng không thấy đơn ${extractedOrderCode} trong hệ thống` });
     }
 
     if (order.status === 1 || order.status === 'paid') {
@@ -93,7 +93,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         description: `${content} [THIẾU TIỀN]`,
         raw_payload: req.body
       });
-      return res.status(400).json({ status: false, message: 'Chuyển thiếu tiền' });
+      r      return res.json({ status: true, message: 'Ghi nhận giao dịch chuyển thiếu tiền' });
     }
 
     // 6. Cập nhật Database
