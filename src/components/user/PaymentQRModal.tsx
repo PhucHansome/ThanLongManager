@@ -166,17 +166,18 @@ export const PaymentQRModal: React.FC<PaymentQRModalProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
               {/* QR Image Box */}
-              <div className="flex flex-col items-center bg-zinc-950 p-4 rounded-2xl border border-zinc-800">
-                <div className="relative w-48 h-48 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center">
+              <div className="flex flex-col items-center bg-zinc-950 p-4 sm:p-5 rounded-2xl border border-zinc-800">
+                {/* Tăng kích thước từ w-48 lên w-64 (máy tính) và w-72 (màn hình lớn) */}
+                <div className="relative w-64 h-64 sm:w-72 sm:h-72 bg-white p-2.5 rounded-xl shadow-inner flex items-center justify-center">
                   <img
                     src={order.qr_url}
                     alt="VietQR Payment Code"
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <div className="text-center mt-3">
-                  <div className="text-[11px] text-zinc-400">Mở app Ngân hàng để quét QR</div>
-                  <div className="text-xs font-bold text-amber-400 font-mono mt-0.5">
+                <div className="text-center mt-4">
+                  <div className="text-xs sm:text-sm text-zinc-400 font-medium">Mở app Ngân hàng để quét QR</div>
+                  <div className="text-sm sm:text-base font-bold text-amber-400 font-mono mt-1">
                     {formatVND(order.amount)}
                   </div>
                 </div>
