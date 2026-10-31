@@ -93,7 +93,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         description: `${content} [THIẾU TIỀN]`,
         raw_payload: req.body
       });
-      r      return res.json({ status: true, message: 'Ghi nhận giao dịch chuyển thiếu tiền' });
+      return res.json({ status: true, message: 'Ghi nhận giao dịch chuyển thiếu tiền' });
     }
 
     // 6. Cập nhật Database
@@ -131,7 +131,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       year: now.getFullYear()
     });
 
-    return res.json({ status: true, message: 'Thanh toán và gia hạn thành công!' });
+    return res.status(200).json({ success: true, message: 'Thanh toán và gia hạn thành công!' });
   } catch (err: any) {
     console.error("Lỗi xử lý webhook:", err);
     return res.status(500).json({ status: false, message: err.message });
