@@ -28,7 +28,14 @@ import systemVersionHandler from './_system/version.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const url = req.url || '';
-  const path = url.replace(/^\/api/, '').split('?')[0];
+  // Xóa dấu gạch chéo ở cuối nếu có (ví dụ: /webhook/sepay/ -> /webhook/sepay)
+  let path = url.replace(/^\/api/, '').split('?')[0];
+  if (path.length > 1 && path.endsWith('/')) {
+    path = path.slice(0, -1);
+  }
+  
+  // Thêm dòng này để in ra log, xem SePay gọi đường dẫn là gì
+  console.log("🔍 Đường dẫn nhận được từ SePay:", path);
 
   // 1. Nhóm Auth
   if (path === '/auth/login') return loginHandler(req, res);
