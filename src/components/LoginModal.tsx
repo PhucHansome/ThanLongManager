@@ -200,8 +200,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         )}
         {/* Brand Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-400 text-zinc-950 shadow-xl shadow-amber-500/15 mb-3">
-            <Terminal className="w-8 h-8 font-black" />
+          <div className="inline-flex items-center justify-center w-20 h-20 mb-3 hover:scale-105 transition-transform">
+            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(245,158,11,0.3)]" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-zinc-100">
             Thần Long Mobile <span className="text-amber-400">Auto Pro</span>
