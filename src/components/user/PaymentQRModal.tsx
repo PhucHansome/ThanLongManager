@@ -54,12 +54,13 @@ export const PaymentQRModal: React.FC<PaymentQRModalProps> = ({
     const pollStatus = async () => {
       try {
         const updated = await apiCheckOrderStatus(order.order_code);
-        if (updated.status === 'paid') {
+        if (updated?.status === 'paid' || (updated?.status as any) === 1) {
+          console.log("Đã nhận trạng thái Paid:", updated);
           setStatus('paid');
           triggerSuccess(updated);
         }
       } catch (err) {
-        // silent fail on network hiccups
+        console.error("Lỗi kiểm tra trạng thái:", err);
       }
     };
 
