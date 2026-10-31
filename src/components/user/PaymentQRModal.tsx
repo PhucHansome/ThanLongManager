@@ -89,7 +89,7 @@ export const PaymentQRModal: React.FC<PaymentQRModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
-      <div className="w-full max-w-xl bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl p-6 sm:p-7 relative overflow-hidden">
+            <div className="w-full max-w-3xl bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl p-6 sm:p-8 relative overflow-hidden">
         {/* Top bar */}
         <button
           onClick={onClose}
