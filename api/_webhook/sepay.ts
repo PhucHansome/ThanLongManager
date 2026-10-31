@@ -123,7 +123,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const now = new Date();
     await supabase.from('revenue_ledger').insert({
       order_id: order.id,
-      gross: amount,
+      gross_amount: amount,
       commission_pct: 0,
       commission_amt: 0,
       net_amount: amount,
