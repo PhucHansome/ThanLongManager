@@ -44,6 +44,47 @@ function MainApp() {
     checkAuth();
   }, []);
 
+  // ⭐ BẮT ĐẦU: CHẶN F12 VÀ CÁC PHÍM TẮT XEM MÃ NGUỒN
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // 1. Chặn phím F12
+      if (e.key === 'F12' || e.keyCode === 123) {
+        e.preventDefault();
+        return false;
+      }
+
+      // 2. Chặn tổ hợp Ctrl + Shift + I / J / C (Mở DevTools)
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        e.shiftKey &&
+        (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)
+      ) {
+        e.preventDefault();
+        return false;
+      }
+
+      // 3. Chặn Ctrl + U (Xem mã nguồn trang)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
+        e.preventDefault();
+        return false;
+      }
+    };
+
+    // 4. Chặn chuột phải (Context Menu)
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('contextmenu', handleContextMenu);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('contextmenu', handleContextMenu);
+    };
+  }, []);
+  // ⭐ KẾT THÚC: CHẶN F12
+
   const handleLoginSuccess = (newSession: AuthSession) => {
     setSession({ user: newSession.user, license: newSession.license });
     setCurrentRoleView(newSession.user.role);
@@ -69,7 +110,7 @@ function MainApp() {
     );
   }
 
-  // 1. CHƯA ĐĂNG NHẬP: Hiển thị trực tiếp form Đăng nhập / Đăng ký (đã bỏ Landing Page)
+  // 1. CHƯA ĐĂNG NHẬP: Hiển thị trực tiếp form Đăng nhập / Đăng ký
   if (!session) {
     return (
       <LoginModal
