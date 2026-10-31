@@ -51,7 +51,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     if (!extractedOrderCode) {
       // Tìm chuỗi TLBB... ở bất kỳ đâu trong nội dung (kể cả dính liền chữ)
-      const match = content.toUpperCase().match(/(TLBB[A-Z0-9]{4,12})/);
+      const match = content.toUpperCase().match(/(SEVQR[A-Z0-9]{4,12})/);
       extractedOrderCode = match ? match[1] : null;
     }
 

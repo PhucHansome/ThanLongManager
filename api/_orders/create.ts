@@ -55,7 +55,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       licenseAfter = base;
     }
 
-    const orderCode = 'TLBB' + Math.floor(100000 + Math.random() * 900000);
+    const orderCode = 'SEVQR' + Math.floor(100000 + Math.random() * 900000);
     const qrUrl = `https://img.vietqr.io/image/${ADMIN_BANK_CODE}-${ADMIN_BANK_ACCOUNT}-compact2.png?amount=${price}&addInfo=${orderCode}&accountName=${encodeURIComponent(ADMIN_BANK_NAME)}`;
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
 
