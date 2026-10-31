@@ -44,12 +44,12 @@ function MainApp() {
     checkAuth();
   }, []);
 
-  // ⭐ BẮT ĐẦU: CHẶN F12 VÀ CÁC PHÍM TẮT XEM MÃ NGUỒN
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // 1. Chặn phím F12
       if (e.key === 'F12' || e.keyCode === 123) {
         e.preventDefault();
+        alert('⚠️ CẢNH BÁO: Hành vi mở DevTools (F12) đã bị vô hiệu hóa vì lý do bảo mật!');
         return false;
       }
 
@@ -60,12 +60,14 @@ function MainApp() {
         (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)
       ) {
         e.preventDefault();
+        alert('⚠️ CẢNH BÁO: Hành vi mở DevTools đã bị vô hiệu hóa vì lý do bảo mật!');
         return false;
       }
 
       // 3. Chặn Ctrl + U (Xem mã nguồn trang)
       if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
         e.preventDefault();
+        alert('⚠️ CẢNH BÁO: Hành vi xem mã nguồn trang đã bị vô hiệu hóa vì lý do bảo mật!');
         return false;
       }
     };
@@ -73,6 +75,8 @@ function MainApp() {
     // 4. Chặn chuột phải (Context Menu)
     const handleContextMenu = (e: MouseEvent) => {
       e.preventDefault();
+      // Bạn có thể bỏ comment dòng dưới nếu muốn hiện thông báo cả khi chuột phải
+      // alert('⚠️ CẢNH BÁO: Chuột phải đã bị vô hiệu hóa!'); 
     };
 
     document.addEventListener('keydown', handleKeyDown);

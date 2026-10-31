@@ -63,19 +63,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const pendingThisMonth = thisMonthOrders.filter(o => o.status === 0 || o.status === 'pending').length;
     const paidThisMonth = thisMonthOrders.filter(o => o.status === 1 || o.status === 'paid').length;
 
-    // 5. Thống kê 12 tháng gần nhất
+        // 5. Thống kê 12 tháng gần nhất
     const monthlyRevenue12m = [];
     for (let i = 11; i >= 0; i--) {
       const d = new Date();
       d.setMonth(d.getMonth() - i);
       const m = d.getMonth() + 1;
       const y = d.getFullYear();
+      
+      // Lọc các bản ghi của tháng m, năm y
       const monthItems = allLedgers.filter(r => r.month === m && r.year === y);
+      
       monthlyRevenue12m.push({
         month_label: `T${m.toString().padStart(2, '0')}/${y.toString().slice(-2)}`,
         month: m,
         year: y,
-        gross: monthItems.reduce((a, c) => a + Number(c.gross || 0), 0),
+        // ⭐ SỬA LỖI TẠI ĐÂY: Đổi c.gross thành c.gross_amount
+        gross: monthItems.reduce((a, c) => a + Number(c.gross_amount || 0), 0),
         net: monthItems.reduce((a, c) => a + Number(c.net_amount || 0), 0),
         order_count: monthItems.length
       });
